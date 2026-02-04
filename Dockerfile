@@ -22,12 +22,18 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar a CLI do Claude e garantir que esteja no PATH
-RUN curl -fsSL https://claude.ai/install.sh | bash \
-    && ln -s /root/.local/bin/claude /usr/local/bin/claude || true
+# Criar usuário não-root para rodar a aplicação
+RUN useradd -m -u 1000 appuser
 
-# Adicionar ~/.local/bin ao PATH para todos os usuários
-ENV PATH="/root/.local/bin:${PATH}"
+# Instalar a CLI do Claude como appuser
+USER appuser
+RUN curl -fsSL https://claude.ai/install.sh | bash
+
+# Adicionar ~/.local/bin ao PATH do appuser
+ENV PATH="/home/appuser/.local/bin:${PATH}"
+
+# Voltar para root para instalar dependências e copiar arquivos
+USER root
 
 # Criar diretório da aplicação
 WORKDIR /app
@@ -47,6 +53,9 @@ EXPOSE 3000
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/api/v1/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Mudar para appuser para rodar a aplicação
+USER appuser
 
 # Comando para iniciar a aplicação
 CMD ["npm", "start"]
