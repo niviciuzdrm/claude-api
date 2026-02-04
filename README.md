@@ -7,12 +7,18 @@ API REST construída com arquitetura escalável para executar comandos do Claude
 - Docker instalado ([Guia de instalação](https://docs.docker.com/get-docker/))
 - Terminal/Command Line
 
-## 🚀 Como Usar
+## Como Usar
 
 ### 1. Construir a Imagem Docker
 
 ```bash
 docker build -t ubuntu-claude-api .
+```
+
+ou
+
+```bash
+docker compose build
 ```
 
 ### 2️. Executar o Container
@@ -21,10 +27,16 @@ docker build -t ubuntu-claude-api .
 docker run -p 3000:3000 ubuntu-claude-api
 ```
 
+ou 
+
+```bash
+docker compose up
+```
+
 ### 3️. Testar a API
 
 ```bash
-# Versão do Claude CLI ⭐
+# Versão do Claude CLI
 curl http://localhost:3000/api/v1/claude/version
 
 # Health check
